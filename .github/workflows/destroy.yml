@@ -1,0 +1,48 @@
+name: Azure Destroy Resources
+
+on:
+  workflow_dispatch: # Allows the workflow to be triggered manually
+
+# Special permissions required for OIDC authentication
+permissions:
+  id-token: write
+  contents: read
+
+# environment variables
+env:
+  ARM_CLIENT_ID: "${{ secrets.AZURE_CLIENT_ID }}"
+  ARM_SUBSCRIPTION_ID: "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+  ARM_TENANT_ID: "${{ secrets.AZURE_TENANT_ID }}"
+
+jobs:
+  terraform-destroy:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Terraform install
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: "1.9.8"
+
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Terraform Init
+      run: terraform init
+      working-directory: ./infra/parent_directory/
+
+    - name: Terraform Plan
+      run: terraform plan -out "tfplan"
+      working-directory: ./infra/parent_directory/
+
+    - name: Terraform Destroy
+      run: terraform destroy -auto-approve -input=false
+      working-directory: ./infra/parent_directory/
+      

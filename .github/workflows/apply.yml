@@ -1,0 +1,74 @@
+name: Azure Apply Workflow
+
+on:
+  push:
+    branches:
+      - main   
+
+# Special permissions required for OIDC authentication
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  ARM_CLIENT_ID: "${{ secrets.AZURE_CLIENT_ID }}"
+  ARM_SUBSCRIPTION_ID: "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+  ARM_TENANT_ID: "${{ secrets.AZURE_TENANT_ID }}"
+
+jobs: 
+  terraform-apply:
+      runs-on: ubuntu-24.04
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Terraform install
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Terraform Init
+        run: terraform init -reconfigure
+        working-directory: ./infra/parent_directory/
+
+      - name: Terraform Plan
+        run: terraform plan -out "tfplan"
+        working-directory: ./infra/parent_directory/
+
+      - name: Convert Terraform Plan to JSON
+        run: terraform show -json tfplan | grep '^{.*}$' > tfplan.json
+        working-directory: ./infra/parent_directory/
+
+      - name: Setup OPA
+        uses: open-policy-agent/setup-opa@v2
+        with:
+          version: "1.0.0"
+
+      - name: Run OPA Authz Policy Check
+        id: opa-authz-check
+        run: |
+          result=$(opa eval --data .github/workflows/terraform.rego --input ./infra/parent_directory/tfplan.json "data.terraform.analysis.authz" --format=json | jq '.result[0].expressions[0].value')
+          echo "result=$result" >> $GITHUB_ENV
+          echo $result
+        continue-on-error: false
+      
+      - name: Run OPA Score Policy Check
+        id: opa-score-check
+        run: |
+          opa eval --data .github/workflows/terraform.rego --input ./infra/parent_directory/tfplan.json "data.terraform.analysis.score"
+        continue-on-error: false
+      
+      - name: Terraform Apply
+        if: env.result == 'true'
+        run: terraform apply -auto-approve
+        working-directory: ./infra/parent_directory/
+      
