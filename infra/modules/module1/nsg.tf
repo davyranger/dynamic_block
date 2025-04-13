@@ -13,7 +13,7 @@ resource "azurerm_network_security_group" "app_nsg" {
   resource_group_name = azurerm_resource_group.app_rg.name
 
   dynamic "security_rule" {
-    for_each = flatten(local.ingress_config.ingress_rules)
+    for_each = local.ingress_config.ingress_rules
     content {
       name                         = security_rule.value.name
       priority                     = security_rule.value.priority
