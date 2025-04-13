@@ -1,5 +1,5 @@
 locals {
-  yaml_rg = yamldecode(file("${path.module}/../../data/clients.yml"))
+  yaml_rg = yamldecode(file("${path.module}/../../data/clients.yaml"))
 }
 
 resource "azurerm_resource_group" "this" {
