@@ -16,7 +16,7 @@ terraform {
 
   backend "azurerm" {
     resource_group_name  = "terraform"              # Resource group where the storage account is located
-    storage_account_name = "workflowstatefiles1"    # Azure Storage account for storing the state file
+    storage_account_name = "workflowstatefiles"    # Azure Storage account for storing the state file
     container_name       = "template-dynamic-block" # Blob container where the state file will be stored
     key                  = "terraform.tfstate"      # Name of the Terraform state file
     use_oidc             = true                     # Enable OIDC for authentication with Azure
@@ -31,5 +31,5 @@ provider "azurerm" {
   features {}                              # Enables the use of the AzureRM provider without additional config
   use_oidc                        = true   # OIDC authentication with Azure (useful for GitHub Actions)
   resource_provider_registrations = "none" # Disable automatic resource provider registrations
-  subscription_id                 = "4897f781-f85c-4e73-9c2e-1ddee2c3f763"
+  subscription_id                 = "54d76c1b-a9fe-4b89-93cb-2585ce0dacb9"
 }
