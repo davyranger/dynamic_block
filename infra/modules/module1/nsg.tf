@@ -1,5 +1,5 @@
 locals {
-  ingress_config = yamldecode(file("${path.module}/../../data/nsg_rules.yaml"))
+  nsg_data = yamldecode(file("${path.module}/../../data/nsg_rules.yaml")).nsgs
 }
 
 resource "azurerm_resource_group" "app_rg" {
@@ -8,12 +8,13 @@ resource "azurerm_resource_group" "app_rg" {
 }
 
 resource "azurerm_network_security_group" "app_nsg" {
-  name                = "app-nsg-${var.resource_group_name}"
-  location            = var.location
+  for_each            = local.nsg_data
+  name                = each.key
+  location            = each.value.location
   resource_group_name = azurerm_resource_group.app_rg.name
 
   dynamic "security_rule" {
-    for_each = local.ingress_config.ingress_rules
+    for_each = each.value.rules
     content {
       name                         = security_rule.value.name
       priority                     = security_rule.value.priority

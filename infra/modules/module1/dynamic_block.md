@@ -99,26 +99,48 @@ With the dynamic block approach, Terraform generates these nested blocks for you
 Your YAML file likely has a structure similar to this:
 
 ```yaml
-ingress_rules:
-  - name: "AllowHTTP"
+all_rules:
+  # inbound rules
+  - name: AllowSSH
+    description: Allow SSH from anywhere
     priority: 100
-    direction: "Inbound"
-    access: "Allow"
+    access: Allow
+    direction: Inbound
+    source_port_range: 22
+    destination_port_range: 22
+    protocol: Tcp
+    source_address_prefixes:
+      - "0.0.0.0/0"
+    destination_address_prefixes:
+      - "198.0.0.1/32"
+
+  - name: AllowHTTP
+    description: Allow HTTP from anywhere
+    priority: 200
+    access: Allow
+    direction: Inbound
+    source_port_range: 80
+    destination_port_range: 80
+    protocol: Tcp
+    source_address_prefixes:
+      - "0.0.0.0/0"
+    destination_address_prefixes:
+      - "198.0.0.1/32"
+
+  # outbound rules
+  - name: AllowInternet
+    description: Allow outbound to internet
+    priority: 300
+    access: Allow
+    direction: Outbound
     source_port_range: "*"
-    destination_port_range: "80"
-    protocol: "Tcp"
-    source_address_prefixes: ["0.0.0.0/0"]
-    destination_address_prefixes: ["10.0.0.0/24"]
-  
-  - name: "AllowHTTPS"
-    priority: 101
-    direction: "Inbound"
-    access: "Allow"
-    source_port_range: "*"
-    destination_port_range: "443"
-    protocol: "Tcp"
-    source_address_prefixes: ["0.0.0.0/0"]
-    destination_address_prefixes: ["10.0.0.0/24"]
+    destination_port_range: 443
+    protocol: Tcp
+    source_address_prefixes:
+      - "198.0.0.1/32"
+    destination_address_prefixes:
+      - "0.0.0.0/0"
+
   
   # Additional rules...
 ```

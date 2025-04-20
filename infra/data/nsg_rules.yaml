@@ -1,26 +1,88 @@
-ingress_rules:
-  - name: AllowSSH
-    description: Allow SSH from anywhere
-    priority: 100
-    access: Allow
-    direction: Inbound
-    source_port_range: 22
-    destination_port_range: 22
-    protocol: Tcp
-    source_address_prefixes: 
-      - "0.0.0.0/0"
-    destination_address_prefixes: 
-      - "198.0.0.1/32"
+nsgs:
+  app-nsg-frontend:
+    location: australiaeast
+    rules:
+      # inbound rules
+      - name: AllowSSH
+        description: Allow SSH from anywhere
+        priority: 100
+        access: Allow
+        direction: Inbound
+        source_port_range: "*"
+        destination_port_range: 22
+        protocol: Tcp
+        source_address_prefixes:
+          - "0.0.0.0/0"
+        destination_address_prefixes:
+          - "198.0.0.1/32"
 
-  - name: AllowHTTP
-    description: Allow HTTP from anywhere
-    priority: 200
-    access: Allow
-    direction: Inbound
-    source_port_range: 80
-    destination_port_range: 80
-    protocol: Tcp
-    source_address_prefixes: 
-      - "0.0.0.0/0"
-    destination_address_prefixes: 
-      - "198.0.0.1/32"
+      - name: AllowHTTP
+        description: Allow HTTP from anywhere
+        priority: 200
+        access: Allow
+        direction: Inbound
+        source_port_range: "*"
+        destination_port_range: 80
+        protocol: Tcp
+        source_address_prefixes:
+          - "0.0.0.0/0"
+        destination_address_prefixes:
+          - "198.0.0.1/32"
+
+      # outbound rules
+      - name: AllowInternet
+        description: Allow outbound to internet
+        priority: 100
+        access: Allow
+        direction: Outbound
+        source_port_range: "*"
+        destination_port_range: 443
+        protocol: Tcp
+        source_address_prefixes:
+          - "198.0.0.1/32"
+        destination_address_prefixes:
+          - "0.0.0.0/0"
+
+  app-nsg-backend:
+    location: australiaeast
+    rules:
+      # inbound rules
+      - name: AllowSSH
+        description: Allow SSH from anywhere
+        priority: 100
+        access: Allow
+        direction: Inbound
+        source_port_range: "*"
+        destination_port_range: 22
+        protocol: Tcp
+        source_address_prefixes:
+          - "0.0.0.0/0"
+        destination_address_prefixes:
+          - "198.0.0.1/32"
+
+      - name: AllowHTTP
+        description: Allow HTTP from anywhere
+        priority: 200
+        access: Allow
+        direction: Inbound
+        source_port_range: "*"
+        destination_port_range: 80
+        protocol: Tcp
+        source_address_prefixes:
+          - "0.0.0.0/0"
+        destination_address_prefixes:
+          - "198.0.0.1/32"
+
+      # outbound rules
+      - name: AllowInternet
+        description: Allow outbound to internet
+        priority: 100
+        access: Allow
+        direction: Outbound
+        source_port_range: "*"
+        destination_port_range: 443
+        protocol: Tcp
+        source_address_prefixes:
+          - "198.0.0.1/32"
+        destination_address_prefixes:
+          - "0.0.0.0/0"
