@@ -1,0 +1,91 @@
+nsg-web-tier-staging:
+  location: australiaeast
+  rules:
+    # inbound rules
+    - name: AllowSSH
+      description: Allow SSH access for management from any source
+      priority: 100
+      access: Allow
+      direction: Inbound
+      source_port_range: "*"
+      destination_port_range: 22
+      protocol: Tcp
+      source_address_prefixes:
+        - "0.0.0.0/0"
+      destination_address_prefixes:
+        - "198.0.0.1/32"
+
+    - name: AllowHTTP
+      description: Allow HTTP traffic to web servers from anywhere
+      priority: 200
+      access: Allow
+      direction: Inbound
+      source_port_range: "*"
+      destination_port_range: 80
+      protocol: Tcp
+      source_address_prefixes:
+        - "0.0.0.0/0"
+      destination_address_prefixes:
+        - "198.0.0.1/32"
+
+    # outbound rules
+    - name: AllowInternetOutbound
+      description: Allow outbound traffic to the internet
+      priority: 100
+      access: Allow
+      direction: Outbound
+      source_port_range: "*"
+      destination_port_range: 443
+      protocol: Tcp
+      source_address_prefixes:
+        - "198.0.0.1/32"
+      destination_address_prefixes:
+        - "0.0.0.0/0"
+
+nsg-api-tier-staging:
+  location: australiaeast
+  rules:
+    # inbound rules
+    - name: AllowSSH
+      description: Allow SSH access from anywhere for backend API servers
+      priority: 100
+      access: Allow
+      direction: Inbound
+      source_port_range: "*"
+      destination_port_range: 22
+      protocol: Tcp
+      source_address_prefixes:
+        - "0.0.0.0/0"
+      destination_address_prefixes:
+        - "198.0.0.1/32"
+
+    - name: AllowHTTP
+      description: Allow HTTP traffic from the internet to backend API servers
+      priority: 200
+      access: Allow
+      direction: Inbound
+      source_port_range: "*"
+      destination_port_range: 80
+      protocol: Tcp
+      source_address_prefixes:
+        - "0.0.0.0/0"
+      destination_address_prefixes:
+        - "198.0.0.1/32"
+
+    # outbound rules
+    - name: AllowInternetOutbound
+      description: Allow API servers to connect to the internet
+      priority: 100
+      access: Allow
+      direction: Outbound
+      source_port_range: "*"
+      destination_port_range: 443
+      protocol: Tcp
+      source_address_prefixes:
+        - "198.0.0.1/32"
+      destination_address_prefixes:
+        - "0.0.0.0/0"
+
+nsg-default-rules:
+  location: australiaeast
+  rules: []

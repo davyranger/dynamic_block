@@ -1,0 +1,41 @@
+nsg-frontend-web-prod:
+  location: "australiaeast"
+  rules:
+    - name: "AllowSSH"
+      priority: 100
+      direction: "Inbound"
+      access: "Allow"
+      protocol: "Tcp"
+      source_port_range: "*"
+      destination_port_range: "22"
+      source_address_prefixes: 
+        - "0.0.0.0/0"
+      destination_address_prefixes: 
+        - "198.0.0.1/32"
+
+    - name: "AllowHTTP"
+      priority: 200
+      direction: "Inbound"
+      access: "Allow"
+      protocol: "Tcp"
+      source_port_range: "*"
+      destination_port_range: "80"
+      source_address_prefixes: 
+        - "0.0.0.0/0"
+      destination_address_prefixes: 
+        - "198.0.0.1/32"
+
+nsg-frontend-api-prod:
+  location: "australiaeast"
+  rules:
+    - name: "AllowHTTPS"
+      priority: 100
+      direction: "Inbound"
+      access: "Allow"
+      protocol: "Tcp"
+      source_port_range: "*"
+      destination_port_range: "443"
+      source_address_prefixes: 
+        - "0.0.0.0/0"
+      destination_address_prefixes: 
+        - "198.0.0.1/32"
