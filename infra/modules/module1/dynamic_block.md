@@ -181,22 +181,4 @@ all_rules:
    - Keeps your Terraform code clean and focused on infrastructure
    - YAML is typically easier to read for complex rule sets
 
-## Potential Enhancements
-
-1. **Rule Validation**:
-   - Add validation blocks to ensure YAML rules meet requirements
-   - Example: Check for duplicate priorities or validate port ranges
-
-2. **Conditional Rules**:
-   - Use Terraform's `for` expressions to filter rules based on conditions
-   - Example: `for_each = [for rule in local.ingress_config.ingress_rules : rule if rule.enabled == true]`
-
-3. **Multiple Rule Sources**:
-   - Combine rules from multiple sources using `concat()`
-   - Example: `for_each = concat(local.base_rules, local.environment_specific_rules)`
-
-4. **Default Rules**:
-   - Add default rules that are always included, alongside dynamic rules
-   - Use `merge()` to combine default and custom configurations
-
-By using dynamic blocks in your Azure NSG configuration, you've created a more maintainable, scalable, and flexible approach to security rule management.
+By using dynamic blocks in your Azure NSG configuration, it creates a more maintainable, scalable, and flexible approach to security rule management.
